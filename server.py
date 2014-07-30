@@ -23,9 +23,6 @@ args = parser.parse_args()
 
 d = shelve.open(args.shelvefile)
 print("Currently stored entries: {}".format(len(d)))
-#from pprint import pprint
-#for el in list(d):
-#    pprint(d[el])
 
 @route('/log')
 def log():
