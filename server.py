@@ -9,7 +9,7 @@ from datetime import datetime
 from ipaddress import ip_address
 import argparse
 import shelve
-import hashlib
+import hmac
 import sys
 
 if not ext_deps:
@@ -30,8 +30,7 @@ def log():
         name = request.query.name
         salt = request.query.salt
         auth = request.query.auth
-        authbytes = (salt + args.server_secret).encode('utf-8')
-        if not auth == hashlib.sha512(authbytes).hexdigest():
+        if not hmac.compare_digest(auth, hmac.new(args.server_secret.encode('utf-8'), salt.encode('utf-8'), digestmod='sha1').hexdigest()):
             raise NameError('Auth code incorrect.')
         messagesig = request.query.messagesig
         clienttime = request.query.clienttime

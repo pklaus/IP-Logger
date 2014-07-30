@@ -4,7 +4,8 @@ import urllib.request, urllib.parse, urllib.error
 import json
 from datetime import datetime
 import argparse
-import hashlib, uuid
+import hmac
+import uuid
 import shelve
 import sys
 from ipaddress import ip_address
@@ -26,10 +27,9 @@ data = {}
 data['name'] = args.name
 data['clienttime'] = datetime.now().isoformat()
 data['salt'] = uuid.uuid4().hex
-authbytes = (data['salt'] + args.server_secret).encode('utf-8')
-data['auth'] = hashlib.sha512(authbytes).hexdigest()
-messagesigbytes = (data['salt'] + args.name + args.client_secret + data['clienttime']).encode('utf-8')
-data['messagesig'] = hashlib.sha512(authbytes).hexdigest()
+data['auth'] = hmac.new(args.server_secret.encode('utf-8'), data['salt'].encode('utf-8'), digestmod='sha1').hexdigest()
+messagesigbytes = (data['salt'] + args.name + data['clienttime']).encode('utf-8')
+data['messagesig'] = hmac.new(args.client_secret.encode('utf-8'), messagesigbytes, digestmod='sha1').hexdigest()
 
 url = 'http://{}:{}/log?clienttime={clienttime}&name={name}&salt={salt}&messagesig={messagesig}&auth={auth}'
 url = url.format(args.host, args.port, **data)
