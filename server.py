@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 
-from bottle import route, run, request
+try:
+    from bottle import route, run, request
+    ext_deps = True
+except ImportError:
+    ext_deps = False
 from datetime import datetime
 from ipaddress import ip_address
 import argparse
 import shelve
 import hashlib
+import sys
+
+if not ext_deps:
+    sys.stderr.write("Missing external dependency: bottle. Please install it first.\n")
+    sys.exit(2)
 
 parser = argparse.ArgumentParser(description='IP Logger Server - Logging the remote IP addresses of trusted clients.')
 parser.add_argument('shelvefile', help='The file to store previous requests in.')
