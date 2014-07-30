@@ -37,14 +37,15 @@ def log():
         if not auth == hashlib.sha512(authbytes).hexdigest():
             raise NameError('Auth code incorrect.')
         messagesig = request.query.messagesig
-        clienttime = request.query.time
+        clienttime = request.query.clienttime
+        clienttime = datetime.strptime(clienttime, "%Y-%m-%dT%H:%M:%S.%f")
         servertime = datetime.now()
         ip = ip_address(request.remote_addr)
         dataset = dict(name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip)
         d[servertime.isoformat()] = dataset
     except Exception as ex:
-        return {'message': 'NAK', 'exception': str(ex)}
-    return {'message': 'OK'}
+        return {'success': False, 'exception': str(ex)}
+    return {'success': True, 'data': {'ip': request.remote_addr, 'servertime': servertime.isoformat()} }
 
 run(host='0.0.0.0', port=2000)
 
