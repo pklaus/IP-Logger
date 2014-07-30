@@ -10,7 +10,7 @@ Start the server on a computer that will be available from the Internet:
 
 Call the client whenever you think is the right time to log your IP:
 
-    ./client.py --client-secret V91RS3d7 --server-secret I5au1y9d your_name
+    ./client.py --client-secret V91RS3d7 --server-secret I5au1y9d --name your_name localhost 2000
 
 ### ToDo
 
