@@ -18,7 +18,7 @@ if not ext_deps:
 
 parser = argparse.ArgumentParser(description='IP Logger Server - Logging the remote IP addresses of trusted clients.')
 parser.add_argument('shelvefile', help='The file to store previous requests in.')
-parser.add_argument('--server-secret', '-s', help='The secret code of this server.')
+parser.add_argument('--server-secret', '-s', help='The secret code of this server.', required=True)
 args = parser.parse_args()
 
 d = shelve.open(args.shelvefile)
