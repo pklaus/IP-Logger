@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 try:
-    from bottle import route, run, request
+    from bottle import Bottle, route, run, request
     ext_deps = True
 except ImportError:
     ext_deps = False
@@ -19,7 +19,9 @@ if not ext_deps:
 DATA = None
 SERVER_SECRET = None
 
-@route('/log')
+app = Bottle()
+
+@app.route('/log')
 def log():
     try:
         name = request.query.name
@@ -51,7 +53,7 @@ def main():
     DATA = shelve.open(args.shelvefile)
     print("Currently stored entries: {}".format(len(DATA)))
     
-    run(host='0.0.0.0', port=2000)
+    run(app, host='0.0.0.0', port=2000)
     
     DATA.close()
 
