@@ -31,8 +31,11 @@ print("Earliest entry: {}.".format(earliest))
 print("Latest entry: {}.".format(latest))
 print("Names used: {}.".format(nameset))
 
-# Analyze whatever else you like...
-#pdb.set_trace()
+content = [d[a] for a in d]
+pprint(content)
+
+print("Analyze whatever else you like. Enter `c` to quit.")
+pdb.set_trace()
 
 d.close()
 
