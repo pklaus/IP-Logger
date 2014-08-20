@@ -9,7 +9,7 @@ import uuid
 import shelve
 import sys
 from ipaddress import ip_address
-from tools import reverse_entry_for
+from tools import reverse_entry_for, get_ip_address
 
 def main():
     parser = argparse.ArgumentParser(description='IP Logger Client')
@@ -53,7 +53,7 @@ def main():
             sys.stderr.write("\n")
             sys.exit(128)
         # customizations of the dataset to be logged locally:
-        data['ip'] = ip_address(result['data']['ip'])
+        data['ip'] = get_ip_address(result['data']['ip'])
         data['reverseclient'] = result['data']['reverseclient']
         data['clienttime'] = clienttime
         data['servertime'] = datetime.strptime(result['data']['servertime'], "%Y-%m-%dT%H:%M:%S.%f")

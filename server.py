@@ -12,7 +12,7 @@ import shelve
 import hmac
 import sys
 import traceback
-from tools import reverse_entry_for
+from tools import reverse_entry_for, get_ip_address
 
 if not ext_deps:
     sys.stderr.write("Missing external dependency: bottle. Please install it first.\n")
@@ -38,7 +38,7 @@ def log():
         reversehost = request.query.reversehost
         clienttime = datetime.strptime(clienttime, "%Y-%m-%dT%H:%M:%S.%f")
         servertime = datetime.now()
-        ip = ip_address(request.remote_addr)
+        ip = get_ip_address(request.remote_addr)
         reverseclient = reverse_entry_for(request.remote_addr)
         dataset = dict(host=host, reversehost=reversehost, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
         DATA[servertime.isoformat()] = dataset
