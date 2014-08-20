@@ -15,8 +15,7 @@ Call the client whenever you think is the right time to log your IP:
 
 ### ToDo
 
-1. Log IPv4 and IPv6 if available.
-2. Extend log format for a field 'type' being one of {'client', 'server'}.
+1. Extend log format for a field 'type' being one of {'client', 'server'}.
 
 ### More Data Storage Options
 

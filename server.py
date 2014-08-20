@@ -46,14 +46,17 @@ def main():
 
     parser = argparse.ArgumentParser(description='IP Logger Server - Logging the remote IP addresses of trusted clients.')
     parser.add_argument('shelvefile', help='The file to store previous requests in.')
-    parser.add_argument('--server-secret', '-s', help='The secret code of this server.', required=True)
+    parser.add_argument('--server-secret', metavar='R@Nd0MK3y', help='The secret code of this server.', required=True)
+    parser.add_argument('--server-adapter', metavar='wsgiref', default='wsgiref', help='Which server to run this web app with. Depends on 3rd party Python modules.  If you need IPv6, try "cherrypy".')
+    parser.add_argument('--host', metavar='0.0.0.0', default='0.0.0.0', help='The host/IP to bind the server to. Use "::" for IPv6.')
+    parser.add_argument('--port', metavar=2000, default=2000, type=int, help='The port the server should listen at. Default: 2000.')
     args = parser.parse_args()
     SERVER_SECRET = args.server_secret
     
     DATA = shelve.open(args.shelvefile)
     print("Currently stored entries: {}".format(len(DATA)))
     
-    run(app, host='0.0.0.0', port=2000)
+    run(app, server=args.server_adapter, host=args.host, port=args.port)
     
     DATA.close()
 
