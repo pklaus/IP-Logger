@@ -11,6 +11,7 @@ import argparse
 import shelve
 import hmac
 import sys
+import traceback
 from tools import reverse_entry_for
 
 if not ext_deps:
@@ -19,6 +20,7 @@ if not ext_deps:
 
 DATA = None
 SERVER_SECRET = None
+DEBUG = False
 
 app = Bottle()
 
@@ -41,7 +43,11 @@ def log():
         dataset = dict(host=host, reversehost=reversehost, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
         DATA[servertime.isoformat()] = dataset
     except Exception as ex:
-        return {'success': False, 'exception': str(ex)}
+        if DEBUG:
+            tb = traceback.format_exc()
+            return {'success': False, 'exception': "{}: {}\n{}".format(type(ex), ex, tb)}
+        else:
+            return {'success': False, 'exception': "{}".format(ex)}
     # customizations of the dataset to be returned to client:
     del dataset['clienttime']
     dataset['servertime'] = servertime.isoformat()
@@ -50,7 +56,7 @@ def log():
 
 def main():
 
-    global SERVER_SECRET, DATA
+    global SERVER_SECRET, DATA, DEBUG
 
     parser = argparse.ArgumentParser(description='IP Logger Server - Logging the remote IP addresses of trusted clients.')
     parser.add_argument('shelvefile', help='The file to store previous requests in.')
@@ -58,13 +64,16 @@ def main():
     parser.add_argument('--server-adapter', metavar='wsgiref', default='wsgiref', help='Which server to run this web app with. Depends on 3rd party Python modules.  If you need IPv6, try "cherrypy".')
     parser.add_argument('--host', metavar='0.0.0.0', default='0.0.0.0', help='The host/IP to bind the server to. Use "::" for IPv6.')
     parser.add_argument('--port', metavar=2000, default=2000, type=int, help='The port the server should listen at. Default: 2000.')
+    parser.add_argument('--debug', action='store_true', help='Enable debugging mode.')
+
     args = parser.parse_args()
+
+    DEBUG = args.debug
     SERVER_SECRET = args.server_secret
-    
     DATA = shelve.open(args.shelvefile)
     print("Currently stored entries: {}".format(len(DATA)))
     
-    run(app, server=args.server_adapter, host=args.host, port=args.port)
+    run(app, server=args.server_adapter, host=args.host, port=args.port, debug=DEBUG)
     
     DATA.close()
 
