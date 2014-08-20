@@ -37,8 +37,8 @@ def main():
     messagesigbytes = (data['salt'] + args.name + data['clienttime']).encode('utf-8')
     data['messagesig'] = hmac.new(args.client_secret.encode('utf-8'), messagesigbytes, digestmod='sha1').hexdigest()
     
-    url = 'http://{}:{}/log?clienttime={clienttime}&name={name}&salt={salt}&messagesig={messagesig}&auth={auth}'
-    url = url.format(args.host, args.port, **data)
+    url = 'http://{}:{}/log?{}'
+    url = url.format(args.host, args.port, "&".join(["{}={}".format(key, data[key]) for key in data]))
     try:
         result = json.loads(urllib.request.urlopen(url).read().decode('utf-8'))
     except:
