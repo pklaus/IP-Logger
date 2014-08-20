@@ -13,10 +13,6 @@ Call the client whenever you think is the right time to log your IP:
 
     ./client.py --server-secret I5au1y9d --client-secret V91RS3d7 --name your_name --shelvefile clientlogfile HOSTNAME_OF_SERVER 2000
 
-### ToDo
-
-1. Extend log format for a field 'type' being one of {'client', 'server'}.
-
 ### More Data Storage Options
 
 Currently the [shelve](https://docs.python.org/3/library/shelve.html) module is used to store information. Here are alternatives:

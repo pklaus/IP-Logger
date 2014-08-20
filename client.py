@@ -9,6 +9,7 @@ import uuid
 import shelve
 import sys
 from ipaddress import ip_address
+from tools import reverse_entry_for
 
 def main():
     parser = argparse.ArgumentParser(description='IP Logger Client')
@@ -24,9 +25,13 @@ def main():
     if args.shelvefile:
         d = shelve.open(args.shelvefile)
     
+    # Preparing the message to transmit
     data = {}
     data['name'] = args.name
-    data['clienttime'] = datetime.now().isoformat()
+    clienttime = datetime.now()
+    data['clienttime'] = clienttime.isoformat()
+    data['host'] = args.host
+    data['reversehost'] = reverse_entry_for(args.host)
     data['salt'] = uuid.uuid4().hex
     data['auth'] = hmac.new(args.server_secret.encode('utf-8'), data['salt'].encode('utf-8'), digestmod='sha1').hexdigest()
     messagesigbytes = (data['salt'] + args.name + data['clienttime']).encode('utf-8')
@@ -47,10 +52,12 @@ def main():
             sys.stderr.write(result['exception'])
             sys.stderr.write("\n")
             sys.exit(128)
+        # customizations of the dataset to be logged locally:
         data['ip'] = ip_address(result['data']['ip'])
-        data['host'] = "{}:{}".format(args.host, args.port)
-        data['servertime'] = result['data']['servertime']
-        data['servertime'] = datetime.strptime(data['servertime'], "%Y-%m-%dT%H:%M:%S.%f")
+        data['reverseclient'] = result['data']['reverseclient']
+        data['clienttime'] = clienttime
+        data['servertime'] = datetime.strptime(result['data']['servertime'], "%Y-%m-%dT%H:%M:%S.%f")
+        data['type'] = 'client'
         if args.shelvefile: d[data['servertime'].isoformat()] = data
     except KeyError:
         sys.stderr.write("Response seems to be incorrect.\n")

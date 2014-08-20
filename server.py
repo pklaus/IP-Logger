@@ -11,6 +11,7 @@ import argparse
 import shelve
 import hmac
 import sys
+from tools import reverse_entry_for
 
 if not ext_deps:
     sys.stderr.write("Missing external dependency: bottle. Please install it first.\n")
@@ -31,14 +32,21 @@ def log():
             raise NameError('Auth code incorrect.')
         messagesig = request.query.messagesig
         clienttime = request.query.clienttime
+        host = request.query.host
+        reversehost = request.query.reversehost
         clienttime = datetime.strptime(clienttime, "%Y-%m-%dT%H:%M:%S.%f")
         servertime = datetime.now()
         ip = ip_address(request.remote_addr)
-        dataset = dict(name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip)
+        reverseclient = reverse_entry_for(request.remote_addr)
+        dataset = dict(host=host, reversehost=reversehost, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
         DATA[servertime.isoformat()] = dataset
     except Exception as ex:
         return {'success': False, 'exception': str(ex)}
-    return {'success': True, 'data': {'ip': request.remote_addr, 'servertime': servertime.isoformat()} }
+    # customizations of the dataset to be returned to client:
+    del dataset['clienttime']
+    dataset['servertime'] = servertime.isoformat()
+    dataset['ip'] = request.remote_addr
+    return {'success': True, 'data': dataset }
 
 def main():
 
