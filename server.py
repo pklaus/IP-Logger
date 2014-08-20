@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 try:
-    from bottle import Bottle, route, run, request
+    from bottle import Bottle, route, run, request, abort
     ext_deps = True
 except ImportError:
     ext_deps = False
@@ -55,6 +55,22 @@ def log():
     dataset['ip'] = request.remote_addr
     dataset['hostip'] = request.query.hostip
     return {'success': True, 'data': dataset }
+
+@app.route('/list/by/<grouped>')
+def list_log_entries(grouped):
+    if grouped not in ('ip', 'name'): abort(404, 'Requested grouping not supported')
+    by_ip = dict()
+    for key in DATA:
+        d = DATA[key]
+        d['clienttime'] = d['clienttime'].isoformat()
+        d['servertime'] = d['servertime'].isoformat()
+        d['hostip'] = str(d['hostip'])
+        d['ip'] = str(d['ip'])
+        try:
+            by_ip[d[grouped]].append(d)
+        except KeyError:
+            by_ip[d[grouped]] = [d]
+    return dict(entries=by_ip)
 
 def main():
 
