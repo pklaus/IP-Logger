@@ -2,12 +2,18 @@
 import socket
 from ipaddress import IPv4Address, ip_address
 
-def reverse_entry_for(host):
+def lookup(host):
     try:
-        addr = socket.gethostbyname(host)
+        return socket.gethostbyname(host)
     except:
-        addr = host
-    return socket.gethostbyaddr(addr)[0]
+        return host
+
+def reverse_lookup(host):
+    addr = lookup(host)
+    try:
+        return socket.gethostbyaddr(addr)[0]
+    except:
+        return addr
 
 def get_ip_address(text):
     ip = ip_address(text)

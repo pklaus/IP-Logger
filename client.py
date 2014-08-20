@@ -9,7 +9,7 @@ import uuid
 import shelve
 import sys
 from ipaddress import ip_address
-from tools import reverse_entry_for, get_ip_address
+from tools import reverse_lookup, lookup, get_ip_address
 
 def main():
     parser = argparse.ArgumentParser(description='IP Logger Client')
@@ -31,7 +31,8 @@ def main():
     clienttime = datetime.now()
     data['clienttime'] = clienttime.isoformat()
     data['host'] = args.host
-    data['reversehost'] = reverse_entry_for(args.host)
+    data['hostip'] = lookup(args.host)
+    data['reversehost'] = reverse_lookup(args.host)
     data['salt'] = uuid.uuid4().hex
     data['auth'] = hmac.new(args.server_secret.encode('utf-8'), data['salt'].encode('utf-8'), digestmod='sha1').hexdigest()
     messagesigbytes = (data['salt'] + args.name + data['clienttime']).encode('utf-8')

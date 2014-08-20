@@ -12,7 +12,7 @@ import shelve
 import hmac
 import sys
 import traceback
-from tools import reverse_entry_for, get_ip_address
+from tools import reverse_lookup, get_ip_address
 
 if not ext_deps:
     sys.stderr.write("Missing external dependency: bottle. Please install it first.\n")
@@ -35,12 +35,13 @@ def log():
         messagesig = request.query.messagesig
         clienttime = request.query.clienttime
         host = request.query.host
+        hostip = get_ip_address(request.query.hostip)
         reversehost = request.query.reversehost
         clienttime = datetime.strptime(clienttime, "%Y-%m-%dT%H:%M:%S.%f")
         servertime = datetime.now()
         ip = get_ip_address(request.remote_addr)
-        reverseclient = reverse_entry_for(request.remote_addr)
-        dataset = dict(host=host, reversehost=reversehost, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
+        reverseclient = reverse_lookup(str(ip))
+        dataset = dict(host=host, reversehost=reversehost, hostip=hostip, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
         DATA[servertime.isoformat()] = dataset
     except Exception as ex:
         if DEBUG:
@@ -52,6 +53,7 @@ def log():
     del dataset['clienttime']
     dataset['servertime'] = servertime.isoformat()
     dataset['ip'] = request.remote_addr
+    dataset['hostip'] = request.query.hostip
     return {'success': True, 'data': dataset }
 
 def main():
