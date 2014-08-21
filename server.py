@@ -38,7 +38,7 @@ def log():
         hostip = get_ip_address(request.query.hostip)
         reversehost = request.query.reversehost
         clienttime = datetime.strptime(clienttime, "%Y-%m-%dT%H:%M:%S.%f")
-        servertime = datetime.now()
+        servertime = datetime.utcnow()
         ip = get_ip_address(request.remote_addr)
         reverseclient = reverse_lookup(str(ip))
         dataset = dict(host=host, reversehost=reversehost, hostip=hostip, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')

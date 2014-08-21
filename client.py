@@ -28,7 +28,7 @@ def main():
     # Preparing the message to transmit
     data = {}
     data['name'] = args.name
-    clienttime = datetime.now()
+    clienttime = datetime.utcnow()
     data['clienttime'] = clienttime.isoformat()
     data['host'] = args.host
     data['hostip'] = lookup(args.host)
