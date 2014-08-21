@@ -4,7 +4,8 @@ from ipaddress import IPv4Address, ip_address
 
 def lookup(host):
     try:
-        return socket.gethostbyname(host)
+        addrinfo = socket.getaddrinfo(host, 'http')
+        return addrinfo[0][4][0]
     except:
         return host
 
