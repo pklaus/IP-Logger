@@ -9,7 +9,7 @@ import uuid
 import shelve
 import sys
 from ipaddress import ip_address
-from tools import reverse_lookup, lookup, get_ip_address
+from tools import reverse_lookup, lookup, get_ip_address, get_netloc
 
 def main():
     parser = argparse.ArgumentParser(description='IP Logger Client')
@@ -38,8 +38,10 @@ def main():
     messagesigbytes = (data['salt'] + args.name + data['clienttime']).encode('utf-8')
     data['messagesig'] = hmac.new(args.client_secret.encode('utf-8'), messagesigbytes, digestmod='sha1').hexdigest()
     
-    url = 'http://{}:{}/log?{}'
-    url = url.format(args.host, args.port, "&".join(["{}={}".format(key, data[key]) for key in data]))
+    url_netloc = get_netloc(args.host, args.port)
+    url_query = "&".join(["{}={}".format(key, data[key]) for key in data])
+    split_url = urllib.parse.SplitResult(scheme='http', netloc=url_netloc, path='/log', query=url_query, fragment='')
+    url = urllib.parse.urlunsplit(split_url)
     try:
         result = json.loads(urllib.request.urlopen(url).read().decode('utf-8'))
     except:

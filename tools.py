@@ -44,3 +44,14 @@ def get_ip_address(text):
     else:
         return ip
 
+def get_netloc(host, port):
+    try:
+        hostip = ip_address(host)
+        if hostip.version == 6:
+            host = "[{}]".format(hostip)
+        else:
+            host = str(hostip)
+    except:
+        pass
+    return "{}:{}".format(host, port)
+
