@@ -38,7 +38,7 @@ def main():
     messagesigbytes = (data['salt'] + args.name + data['clienttime']).encode('utf-8')
     data['messagesig'] = hmac.new(args.client_secret.encode('utf-8'), messagesigbytes, digestmod='sha1').hexdigest()
     
-    url_netloc = get_netloc(args.host, args.port)
+    url_netloc = get_netloc(data['hostip'], args.port)
     url_query = "&".join(["{}={}".format(key, data[key]) for key in data])
     split_url = urllib.parse.SplitResult(scheme='http', netloc=url_netloc, path='/log', query=url_query, fragment='')
     url = urllib.parse.urlunsplit(split_url)
