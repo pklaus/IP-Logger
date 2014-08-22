@@ -31,6 +31,12 @@ def reverse_lookup(host, family=0):
         return addr
 
 def get_ip_address(text):
+    """
+    This is my wrapper for ipaddress.ip_address().
+
+    If it finds that an IPv4-mapped IPv6 was created,
+    it returns it's IPv4 equivalent.
+    """
     ip = ip_address(text)
     if not hasattr(ip, 'ipv4_mapped'): return ip
     if ip.ipv4_mapped:
