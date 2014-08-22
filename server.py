@@ -12,6 +12,7 @@ import shelve
 import hmac
 import sys
 import traceback
+import socket
 from tools import reverse_lookup, get_ip_address
 
 if not ext_deps:
@@ -40,7 +41,8 @@ def log():
         clienttime = datetime.strptime(clienttime, "%Y-%m-%dT%H:%M:%S.%f")
         servertime = datetime.utcnow()
         ip = get_ip_address(request.remote_addr)
-        reverseclient = reverse_lookup(str(ip))
+        family = socket.AF_INET if ip.version == 4 else socket.AF_INET6
+        reverseclient = reverse_lookup(str(ip), family=family)
         dataset = dict(host=host, reversehost=reversehost, hostip=hostip, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
         DATA[servertime.isoformat()] = dataset
     except Exception as ex:

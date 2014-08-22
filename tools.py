@@ -2,15 +2,29 @@
 import socket
 from ipaddress import IPv4Address, ip_address
 
-def lookup(host):
+def lookup(host, family=0):
+    """
+    Lookup hostname and resolve to IP address.
+
+    You can restrict the lookup to IPv4 or IPv6 by setting
+    family to socket.AF_INET or socket.AF_INET6.
+    """
     try:
-        addrinfo = socket.getaddrinfo(host, 'http')
+        addrinfo = socket.getaddrinfo(host, 'http', family=family)
         return addrinfo[0][4][0]
     except:
         return host
 
-def reverse_lookup(host):
-    addr = lookup(host)
+def reverse_lookup(host, family=0):
+    """
+    Do a reverse lookup (rDNS).
+
+    But first, we try a forward lookup, in case
+    you gave us a host name, not an IP address.
+    For the forward lookup you can again specify
+    the family to search for IPv4/IPv6.
+    """
+    addr = lookup(host, family=0)
     try:
         return socket.gethostbyaddr(addr)[0]
     except:
