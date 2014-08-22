@@ -58,21 +58,48 @@ def log():
     dataset['hostip'] = request.query.hostip
     return {'success': True, 'data': dataset }
 
+def make_json_serializable(d):
+    """
+    Make dataset d JSON serializable.
+    """
+    d['clienttime'] = d['clienttime'].isoformat()
+    d['servertime'] = d['servertime'].isoformat()
+    d['hostip'] = str(d['hostip'])
+    d['ip'] = str(d['ip'])
+    return d
+
 @app.route('/list/by/<grouped>')
 def list_log_entries(grouped):
     if grouped not in ('ip', 'name'): abort(404, 'Requested grouping not supported')
     by_ip = dict()
     for key in DATA:
         d = DATA[key]
-        d['clienttime'] = d['clienttime'].isoformat()
-        d['servertime'] = d['servertime'].isoformat()
-        d['hostip'] = str(d['hostip'])
-        d['ip'] = str(d['ip'])
+        make_json_serializable(d)
         try:
             by_ip[d[grouped]].append(d)
         except KeyError:
             by_ip[d[grouped]] = [d]
     return dict(entries=by_ip)
+
+@app.route('/stats')
+def stats():
+    ret = dict()
+    IPsv4 = set()
+    IPsv6 = set()
+    last_dates = list()
+    for key in DATA:
+        d = DATA[key]
+        if d['ip'].version == 4:
+            IPsv4.add(str(d['ip']))
+        else:
+            IPsv6.add(str(d['ip']))
+        last_dates.append((d['servertime'], key))
+    last_dates.sort(reverse=True)
+    last_dates = last_dates[:4]
+    last_entries = [make_json_serializable(DATA[last[1]]) for last in last_dates]
+    ret['used_ips'] = dict(ipv4=list(IPsv4), ipv6=list(IPsv6))
+    ret['last'] = last_entries
+    return ret
 
 def main():
 
