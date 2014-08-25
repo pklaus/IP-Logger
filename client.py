@@ -8,7 +8,6 @@ import hmac
 import uuid
 import shelve
 import sys
-from ipaddress import ip_address
 from tools import reverse_lookup, lookup, get_ip_address, get_netloc
 
 def main():
