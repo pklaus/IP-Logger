@@ -52,6 +52,7 @@ def get_netloc(host, port):
         else:
             host = str(hostip)
     except:
+        # If host is not an IP address, we leave it as it is.
         pass
     return "{}:{}".format(host, port)
 
