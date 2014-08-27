@@ -1,6 +1,6 @@
 
 import socket
-from ipaddress import IPv4Address, ip_address
+from ipaddress import ip_address
 
 def lookup(host, family=0):
     """
