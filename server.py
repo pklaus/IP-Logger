@@ -90,10 +90,14 @@ def stats():
     for key in DATA:
         d = DATA[key]
         if d['ip'].version == 4:
-            IPsv4.add(str(d['ip']))
+            IPsv4.add(d['ip'])
         else:
-            IPsv6.add(str(d['ip']))
+            IPsv6.add(d['ip'])
         last_dates.append((d['servertime'], key))
+    IPsv4 = sorted(list(IPsv4))
+    IPsv6 = sorted(list(IPsv6))
+    IPsv4 = [str(ip) for ip in IPsv4]
+    IPsv6 = [str(ip) for ip in IPsv6]
     last_dates.sort(reverse=True)
     last_dates = last_dates[:4]
     last_entries = [make_json_serializable(DATA[last[1]]) for last in last_dates]
