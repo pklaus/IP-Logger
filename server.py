@@ -81,28 +81,40 @@ def list_log_entries(grouped):
             by_ip[d[grouped]] = [d]
     return dict(entries=by_ip)
 
+def is_ip(ip):
+    try:
+        ip = ip_address(ip)
+        return True
+    except ValueError:
+        return False
+
 @app.route('/stats')
 def stats():
     ret = dict()
-    IPsv4 = set()
-    IPsv6 = set()
     last_dates = list()
+    unique = {
+      'ipv4_client': set(),
+      'ipv6_client': set(),
+      'reverseclient': set()
+    }
     for key in DATA:
         d = DATA[key]
+        unique['reverseclient'].add(d['reverseclient'])
         if d['ip'].version == 4:
-            IPsv4.add(d['ip'])
+            unique['ipv4_client'].add(d['ip'])
         else:
-            IPsv6.add(d['ip'])
+            unique['ipv6_client'].add(d['ip'])
         last_dates.append((d['servertime'], key))
-    IPsv4 = sorted(list(IPsv4))
-    IPsv6 = sorted(list(IPsv6))
-    IPsv4 = [str(ip) for ip in IPsv4]
-    IPsv6 = [str(ip) for ip in IPsv6]
+    for key in unique:
+        unique[key] = sorted(list(unique[key]))
+        unique[key] = [str(val) for val in unique[key]]
+    unique['reverseclient'] = [dom for dom in unique['reverseclient'] if not is_ip(dom)]
+    unique['reverseclient'] = ['.'.join(y[::-1]) for y in sorted([dom.split('.')[::-1] for dom in unique['reverseclient']])]
     last_dates.sort(reverse=True)
     last_dates = last_dates[:4]
     last_entries = [make_json_serializable(DATA[last[1]]) for last in last_dates]
-    ret['used_ips'] = dict(ipv4=list(IPsv4), ipv6=list(IPsv6))
     ret['last'] = last_entries
+    ret['unique'] = unique
     return ret
 
 def main():
