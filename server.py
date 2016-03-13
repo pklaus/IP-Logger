@@ -43,7 +43,7 @@ def log():
         ip = get_ip_address(request.remote_addr)
         family = socket.AF_INET if ip.version == 4 else socket.AF_INET6
         reverseclient = reverse_lookup(str(ip), family=family)
-        dataset = dict(host=host, reversehost=reversehost, hostip=hostip, name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=ip, reverseclient=reverseclient, type='server')
+        dataset = dict(host=host, reversehost=reversehost, hostip=str(hostip), name=name, salt=salt, messagesig=messagesig, auth=auth, clienttime=clienttime, servertime=servertime, ip=str(ip), reverseclient=reverseclient, type='server')
         DATA[servertime.isoformat()] = dataset
     except Exception as ex:
         if DEBUG:
@@ -64,8 +64,8 @@ def make_json_serializable(d):
     """
     d['clienttime'] = d['clienttime'].isoformat()
     d['servertime'] = d['servertime'].isoformat()
-    d['hostip'] = str(d['hostip'])
-    d['ip'] = str(d['ip'])
+    d['hostip'] = d['hostip']
+    d['ip'] = d['ip']
     return d
 
 @app.route('/list/by/<grouped>')
@@ -100,7 +100,7 @@ def stats():
     for key in DATA:
         d = DATA[key]
         unique['reverseclient'].add(d['reverseclient'])
-        if d['ip'].version == 4:
+        if ip_address(d['ip']).version == 4:
             unique['ipv4_client'].add(d['ip'])
         else:
             unique['ipv6_client'].add(d['ip'])
