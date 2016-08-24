@@ -7,7 +7,8 @@ import argparse
 import shelve
 import hashlib
 import sys
-import pdb
+from IPython import embed
+import pandas as pd
 
 parser = argparse.ArgumentParser(description='Analyzer for IP Logger Logfiles')
 parser.add_argument('shelvefile', help='The file to store previous requests in.')
@@ -20,12 +21,16 @@ print("Currently stored entries: {}".format(len(d)))
 earliest = datetime.now()
 latest = datetime(1900, 1, 1)
 nameset = set()
+data = []
 for el in list(d):
     entry = d[el]
     #pprint(entry)
     earliest = min(entry['servertime'], earliest)
     latest = max(entry['servertime'], latest)
     nameset.add(entry['name'])
+    data.append(entry)
+
+df = pd.DataFrame(data)
 
 print("Earliest entry: {}.".format(earliest))
 print("Latest entry: {}.".format(latest))
@@ -35,7 +40,8 @@ content = [d[a] for a in d]
 pprint(content)
 
 print("Analyze whatever else you like. Enter `c` to quit.")
-pdb.set_trace()
+print("Data available as df")
+embed()
 
 d.close()
 
